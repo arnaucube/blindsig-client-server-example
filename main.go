@@ -39,7 +39,12 @@ func postBlindSign(c *gin.Context) {
 		return
 	}
 	k := secretRs[key]
-	sBlind := sk.BlindSign(m, k)
+	sBlind, err := sk.BlindSign(m, k)
+	if err != nil {
+		c.String(http.StatusBadRequest, "err on BlindSign: "+err.Error())
+		return
+	}
+	delete(secretRs, key)
 	c.JSON(http.StatusOK, gin.H{"sBlind": sBlind.String()})
 }
 
@@ -53,5 +58,5 @@ func main() {
 	r.POST("/blindsign", postBlindSign)
 	r.Static("/web", "./client")
 
-	r.Run(":3000")
+	r.Run("127.0.0.1:3000")
 }

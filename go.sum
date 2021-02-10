@@ -22,6 +22,8 @@ github.com/allegro/bigcache v1.2.1-0.20190218064605-e24eb225f156/go.mod h1:Cb/ax
 github.com/aristanetworks/goarista v0.0.0-20170210015632-ea17b1a17847/go.mod h1:D/tb0zPVXnP7fmsLZjtdUhSsumbK/ij54UXjjVgMGxQ=
 github.com/arnaucube/go-blindsecp256k1 v0.0.0-20210117185306-6b939806742d h1:F42/D0P7nMaLqHc/7f4P3PxyMNAiqZWxWrF3C/et6FM=
 github.com/arnaucube/go-blindsecp256k1 v0.0.0-20210117185306-6b939806742d/go.mod h1:10oM1DQMpukFfSzNsjSQG2rE6UjoGsXT4iIxWIiVbu0=
+github.com/arnaucube/go-blindsecp256k1 v0.0.0-20210209195150-ac5d00b89229 h1:sGoixDV1snh3rbWslF6wjGsBvGoM3Ca/I5H+NR3YvG0=
+github.com/arnaucube/go-blindsecp256k1 v0.0.0-20210209195150-ac5d00b89229/go.mod h1:10oM1DQMpukFfSzNsjSQG2rE6UjoGsXT4iIxWIiVbu0=
 github.com/aws/aws-sdk-go v1.25.48/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6 h1:Eey/GGQ/E5Xp1P2Lyx1qj007hLZfbi0+CoVeJruGCtI=
