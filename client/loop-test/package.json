@@ -1,0 +1,15 @@
+{
+  "name": "loop-test",
+  "version": "0.0.1",
+  "description": "",
+  "main": "loop-test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "arnaucube",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "blindsecp256k1": "0.0.5"
+  }
+}
