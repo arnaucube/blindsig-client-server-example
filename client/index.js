@@ -1,7 +1,11 @@
+// This version uses https://github.com/arnaucube/blindsecp256k1-js
+
 // signer public parameters
-let rx, ry, qx, qy;
+let signerR, signerQ;
 // user parameters
-let m, mBlinded, uA, uB, uFx, uFy, sigS, sigFx, sigFy;
+let m, mBlinded, userSecretData, sig;
+
+console.log("A", blindsecp256k1.messageToBigNumber("0x0a"))
 
 function newRequest() {
 	m = document.getElementById("msg").value;
@@ -9,24 +13,21 @@ function newRequest() {
 	axios.get('/request')
 		.then(function (res) {
 			console.log("/request res:", res.data);
-			rx = res.data.signerR.x;
-			ry = res.data.signerR.y;
-			qx = res.data.signerQ.x;
-			qy = res.data.signerQ.y;
-			document.getElementById("signerRx").innerHTML = "signerR.x: " + rx;
-			document.getElementById("signerRy").innerHTML = "signerR.y: " + ry;
+			signerR = blindsecp256k1.Point.fromAffine(blindsecp256k1.ecparams,
+				blindsecp256k1.newBigFromString(res.data.signerR.x),
+				blindsecp256k1.newBigFromString(res.data.signerR.y));
+			signerQ = blindsecp256k1.Point.fromAffine(blindsecp256k1.ecparams,
+				blindsecp256k1.newBigFromString(res.data.signerQ.x),
+				blindsecp256k1.newBigFromString(res.data.signerQ.y));
+			document.getElementById("signerR").innerHTML = "signerR: " + signerR;
 
-			document.getElementById("signerQx").innerHTML = "signerQ.x: " + qx;
-			document.getElementById("signerQy").innerHTML = "signerQ.y: " + qy;
+			document.getElementById("signerQ").innerHTML = "signerQ: " + signerQ;
 
 			console.log("blind msg");
-			let blindRes = wasmBlind(m, rx, ry);
-			console.log("blindRes:", blindRes);
+			let blindRes = blindsecp256k1.blind(m, signerR);
 			mBlinded = blindRes.mBlinded;
-			uA = blindRes.uA;
-			uB = blindRes.uB;
-			uFx = blindRes.uFx;
-			uFy = blindRes.uFy;
+			userSecretData = blindRes.userSecretData;
+			console.log("blindRes:", mBlinded, userSecretData);
 		})
 		.catch(function (error) {
 			console.error(error);
@@ -37,22 +38,22 @@ function newRequest() {
 function askBlindSign() {
 	console.log("askBlindSign");
 	let data = {
-		m: mBlinded,
-		r: {x:rx, y:ry}
+		m: mBlinded.toString(),
+		r: {
+			x: signerR.affineX.toString(),
+			y: signerR.affineY.toString()
+		}
 	};
 	axios.post('/blindsign', data)
 		.then(function (res) {
 			console.log("/blindSign res:", res.data);
 			document.getElementById("sBlind").innerHTML = "sBlind: " + res.data.sBlind;
 
-			let unblindRes = wasmUnblind(res.data.sBlind, m, uA, uB, uFx, uFy);
-			console.log("unblind", unblindRes);
-			sigS = unblindRes.s;
-			sigFx = unblindRes.fx;
-			sigFy = unblindRes.fy;
-			document.getElementById("sigS").innerHTML = "s: " + sigS;
-			document.getElementById("sigFx").innerHTML = "f.x: " + sigFx;
-			document.getElementById("sigFy").innerHTML = "f.y: " + sigFy;
+			sig = blindsecp256k1.unblind(
+				blindsecp256k1.newBigFromString(res.data.sBlind),
+				userSecretData);
+			console.log("unblind", sig);
+			document.getElementById("sig").innerHTML = "sig.s: " + sig.s + ", sig.f: " + sig.f.affineX.toString() +", "+sig.f.affineY.toString();
 		})
 		.catch(function (error) {
 			console.error(error);
@@ -61,8 +62,7 @@ function askBlindSign() {
 }
 
 function verify() {
-	let verified = wasmVerify(m, sigS, sigFx, sigFy, qx, qy);
+	let verified = blindsecp256k1.verify(m, sig, signerQ);
 	console.log("verify", verified);
 	document.getElementById("verified").innerHTML = "signature verification, verified: " + verified;
 }
-

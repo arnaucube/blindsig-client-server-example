@@ -4,25 +4,33 @@
 		<title>blindsig-client-server-example</title>
 	</head>
 	<body>
-		<h3>blindsig-client-server-example (client in js version)</h3>
+		<script src="wasm_exec.js"></script>
+		<script>
+			const go = new Go();
+			WebAssembly.instantiateStreaming(fetch('blindsecp256k1.wasm'), go.importObject).then(function(dat) {
+				go.run(dat.instance);
+			});
+		</script>
+		<h3>blindsig-client-server-example (client in WASM version)</h3>
 		<p>This is an example of usage of <a href="https://github.com/arnaucube/go-blindsecp256k1" target="_blank">https://github.com/arnaucube/go-blindsecp256k1</a></p>
 		<br>
 		Message (only numbers): <input id="msg" value="1234"></input>
 		<button onClick="newRequest();">newRequest()</button>
-		<p id="signerR"></p>
-		<p id="signerQ"></p>
+		<p id="signerRx"></p>
+		<p id="signerRy"></p>
+		<p id="signerQx"></p>
+		<p id="signerQy"></p>
 
 		<button onClick="askBlindSign();">askBlindSign()</button>
 		<p id="sBlind"></p>
-		<p id="sig"></p>
+		<p id="sigS"></p>
+		<p id="sigFx"></p>
+		<p id="sigFy"></p>
 
 		<button onClick="verify();">verify()</button>
 		<p id="verified"></p>
 
-		<a href="index-wasm.html">View the WASM version</a>
-
 		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-		<script src="blindsecp256k1-browser.js"></script>
-		<script src="index.js"></script>
+		<script src="index-wasm.js"></script>
 	</body>
 </html>
