@@ -1,7 +1,7 @@
 // This version uses https://github.com/arnaucube/blindsecp256k1-js
 
-const blindsecp256k1 = require('blindsecp256k1');
-const axios = require('axios');
+// const blindsecp256k1 = require('blindsecp256k1');
+// const axios = require('axios');
 
 let signerR, signerQ, m, mBlinded, userSecretData, blindedSig, sig, errCount, verified;
 
@@ -62,6 +62,7 @@ async function verify() {
 		console.log("sig.s:", sig.s.toString());
 		printPoint("sig.f", sig.f);
 		console.log("verify", verified);
+		alert("ERROR")
 	}
 }
 
@@ -71,7 +72,7 @@ async function iteration() {
 	await verify()
 }
 
-async function main() {
+async function start() {
 	errCount = 0;
 	for (let i=0; i<10000; i++) {
 		m = blindsecp256k1.newKeyPair().sk;
@@ -84,4 +85,3 @@ async function main() {
 	console.log("errCount", errCount);
 }
 
-main()
