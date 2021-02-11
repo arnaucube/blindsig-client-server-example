@@ -64,6 +64,20 @@ async function verify() {
 		console.log("verify", verified);
 		alert("ERROR")
 	}
+	// send to verify by the go server
+	let data = {
+		m: mBlinded.toString(),
+		sig: {
+			s: sig.s.toString(),
+			f: {
+				x: sig.f.affineX.toString(),
+				y: sig.f.affineY.toString()
+			}
+		}
+	};
+	let res = await axios.post(apiUrl+'/blindsign', data);
+	console.log("res", res.data);
+	console.log("ver by server", res.data.verification);
 }
 
 async function iteration() {

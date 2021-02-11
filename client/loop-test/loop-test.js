@@ -52,6 +52,8 @@ async function verify() {
 	verified = blindsecp256k1.verify(m, sig, signerQ);
 	if (!verified) {
 		errCount++;
+		console.log("==verification failed on client==", res.data.verification);
+
 		printPoint("signerR", signerR);
 		printPoint("signerQ", signerQ);
 		console.log("m:", m.toString());
@@ -62,6 +64,55 @@ async function verify() {
 		console.log("sig.s:", sig.s.toString());
 		printPoint("sig.f", sig.f);
 		console.log("verify", verified);
+	}
+
+	// send to verify by the go server
+	let data = {
+		m: m.toString(),
+		sig: {
+			S: sig.s.toString(),
+			F: {
+				x: sig.f.affineX.toString(),
+				y: sig.f.affineY.toString()
+			}
+		},
+		q: {
+				x: signerQ.affineX.toString(),
+				y: signerQ.affineY.toString()
+		}
+	};
+	try {
+		let res = await axios.post(apiUrl+'/verify', data);
+		if (!res.data.verification) {
+			errCount++;
+			console.log("==verification failed on server==", res.data.verification);
+
+			printPoint("signerR", signerR);
+			printPoint("signerQ", signerQ);
+			console.log("m:", m.toString());
+			console.log("mBlinded:", mBlinded.toString());
+			console.log(`userSecretData:\n	a: ${userSecretData.a.toString()}\n	b: ${userSecretData.b.toString()}`);
+			printPoint("userSecretData.f", userSecretData.f);
+			console.log("blinded sig:", blindedSig.toString());
+			console.log("sig.s:", sig.s.toString());
+			printPoint("sig.f", sig.f);
+			console.log("verify", verified);
+		}
+	} catch (error) {
+		console.error(error.response.data);
+			errCount++;
+			console.log("==verification failed on server==", error.response.data.verification);
+
+			printPoint("signerR", signerR);
+			printPoint("signerQ", signerQ);
+			console.log("m:", m.toString());
+			console.log("mBlinded:", mBlinded.toString());
+			console.log(`userSecretData:\n	a: ${userSecretData.a.toString()}\n	b: ${userSecretData.b.toString()}`);
+			printPoint("userSecretData.f", userSecretData.f);
+			console.log("blinded sig:", blindedSig.toString());
+			console.log("sig.s:", sig.s.toString());
+			printPoint("sig.f", sig.f);
+			console.log("js verify", verified);
 	}
 }
 

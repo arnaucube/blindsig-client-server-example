@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/big"
 	"net/http"
 
@@ -48,6 +49,36 @@ func postBlindSign(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"sBlind": sBlind.String()})
 }
 
+type msgPostVerify struct {
+	M   string                    `json:"m"`
+	Sig *blindsecp256k1.Signature `json:"sig"`
+	Q   *blindsecp256k1.PublicKey `json:"q"`
+}
+
+func postVerify(c *gin.Context) {
+	var msg msgPostVerify
+	c.BindJSON(&msg)
+
+	m, ok := new(big.Int).SetString(msg.M, 10)
+	if !ok {
+		c.String(http.StatusBadRequest, "can not parse m")
+		return
+	}
+	fmt.Println(msg.Sig.S, msg.Sig.F)
+	v := blindsecp256k1.Verify(m, msg.Sig, sk.Public())
+	fmt.Println("v", v)
+	if !v {
+		fmt.Println("m", m)
+		fmt.Println("sig.s", msg.Sig.S)
+		fmt.Println("sig.f", msg.Sig.F)
+		fmt.Println("pubk", sk.Public())
+		fmt.Println("q", msg.Q)
+		c.JSON(http.StatusNotAcceptable, gin.H{"verification": false})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"verification": v})
+}
+
 func main() {
 	secretRs = make(map[string]*big.Int)
 	sk = blindsecp256k1.NewPrivateKey()
@@ -56,6 +87,7 @@ func main() {
 
 	r.GET("/request", getNewRequest)
 	r.POST("/blindsign", postBlindSign)
+	r.POST("/verify", postVerify)
 	r.Static("/web", "./client")
 
 	r.Run("127.0.0.1:3000")
